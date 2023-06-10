@@ -1,0 +1,30 @@
+version: '3'
+
+networks:
+  my-network:
+
+services:
+  account-service-db:
+    image: postgres
+    environment: 
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USERNAME=postgres
+    volumes: 
+      - ./data:/var/lib/postgres
+    ports:
+      - 5432:5432
+    networks:
+      - my-network
+
+  account-service:
+    build: ./account-service
+    depends_on:
+      - account-service-db
+    environment:
+      - spring.datasource.url=jdbc:postgresql://account-service-db:5432/accounts-db?createDatabaseIfNotExist=true
+      - spring.datasource.username=postgres
+      - spring.datasource.password=root
+    ports:
+      - 8101:8101
+    networks:
+      - my-network
